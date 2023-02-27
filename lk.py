@@ -51,7 +51,7 @@ def get_session(login, password):
     return s
 
 
-async def get_lk_deadlines(conn, user_id):
+def get_lk_deadlines(conn, user_id):
         login, password = get_credentials(conn, user_id)
         session = get_session(login, password)
 
@@ -92,7 +92,7 @@ async def get_lk_deadlines(conn, user_id):
                 yield {'deadline': dt, 'task': task_name, 'course': course}
 
 
-async def get_lk_lessons(conn, user_id):
+def get_lk_lessons(conn, user_id):
         login, password = get_credentials(conn, user_id)
         session = get_session(login, password)
 

@@ -10,7 +10,7 @@ def get_credentials(conn, user_id):
     return login, password
 
 
-async def get_cpp_deadlines(conn, user_id):
+def get_cpp_deadlines(conn, user_id):
     login, password = get_credentials(conn, user_id)
     s = requests.Session()
 
@@ -47,4 +47,5 @@ async def get_cpp_deadlines(conn, user_id):
         )
 
         for task in group.find_all('div', class_='task unsolved'):
-            yield {'deadline': dt, 'task': task.find('div', class_='name').text, 'course': 'cpp'}
+            if dt > datetime.now():
+                yield {'deadline': dt, 'task': task.find('div', class_='name').text, 'course': 'cpp'}

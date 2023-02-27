@@ -1,10 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 import argparse
-from manytask import get_cpp_deadlines
-from lk import get_lk_deadlines, get_lk_lessons
 from routes import add_routes
 import sqlite3
+from schedule import start_notifying
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,5 +27,7 @@ if __name__ == '__main__':
     bot = Bot(token=args.token)
     dp = Dispatcher(bot)
     add_routes(dp, bot, conn)
+
+    start_notifying(bot)
 
     executor.start_polling(dp, skip_updates=True)
