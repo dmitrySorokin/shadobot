@@ -1,6 +1,8 @@
 from aiogram import Bot, Dispatcher, executor, types
 from lk import get_lk_deadlines, get_lk_lessons
 from manytask import get_cpp_deadlines
+from common import format_date
+import logging
 
 
 def add_routes(dp, bot, conn):
@@ -67,28 +69,42 @@ def add_routes(dp, bot, conn):
     @dp.message_handler(commands=['lk'])
     async def handle_deadlines(message: types.Message):
         try:
-            async for item in get_lk_deadlines(conn, message.from_user.id):
-                await bot.send_message(message.from_user.id, f"dl: {item['deadline']}, tn: {item['task']}, c: {item['course']}")
-        except:
+            no_deadlines = True
+            for item in get_lk_deadlines(conn, message.from_user.id):
+                await bot.send_message(message.from_user.id, f"ДЗ: {item['task']}\nКурс: {item['course']}\nДо: {format_date(item['deadline'])}")
+                no_deadlines = False
+            if no_deadlines:
+                await bot.send_message(message.from_user.id, f"дедлайнов нет")
+        except Exception as e:
             await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signlk')
+            logging.warning('/lk ' + str(e))
+
 
 
     @dp.message_handler(commands=['lessons'])
     async def handle_lessons(message: types.Message):
         try: 
-            async for item in get_lk_lessons(conn, message.from_user.id):
-                await bot.send_message(message.from_user.id, f"date: {item['deadline']}, lesson: {item['course']}")
-            else:
-                await bot.send_message(message.from_user.id, f"date: {item['deadline']}, lesson: {item['course']}")
-        except:
+            no_lessons = True
+            for item in get_lk_lessons(conn, message.from_user.id):
+                await bot.send_message(message.from_user.id, f"Лекция: {item['course']}\n{format_date(item['deadline'])}")
+                no_lessons = False
+            if no_lessons:
+                await bot.send_message(message.from_user.id, f"лекций нет")
+        except Exception as e:
             await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signlk')
+            logging.warning('/lessons ' + str(e))
 
 
     @dp.message_handler(commands=['cpp'])
     async def handle_cpp(message: types.Message):
         try:
-            async for item in get_cpp_deadlines(conn, message.from_user.id):
-                await bot.send_message(message.from_user.id, f"date: {item['deadline']}, task: {item['task']}")
+            no_deadlines = True
+            for item in get_cpp_deadlines(conn, message.from_user.id):
+                await bot.send_message(message.from_user.id, f"Задача: {item['task']}\nДо: {format_date(item['deadline'])}")
+                no_deadlines = False
+            if no_deadlines:
+                await bot.send_message(message.from_user.id, f"дедлайнов нет")
         except Exception as e:
             await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signcpp')
+            logging.warning('/cpp ' + str(e))
 

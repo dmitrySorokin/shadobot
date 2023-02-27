@@ -3,4 +3,5 @@ token
 users.db
 geckodriver.log
 run.sh
+logs.txt
 

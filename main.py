@@ -1,16 +1,16 @@
 import logging
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher, executor
 import argparse
 from routes import add_routes
 import sqlite3
 from schedule import start_notifying
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, filename='logs.txt')
 
 CONFIG = {
     'db_name': 'users.db',
-    'from_hour': 14,
+    'from_hour': 10,
     'to_hour': 21,
     'deadline_notify_days': 3,
     'lesson_notify_min': 15
