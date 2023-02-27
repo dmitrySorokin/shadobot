@@ -1,10 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 import argparse
-from manytask import add_manytask
-from lk import add_lkdeadline, add_lklessions
-from signup import add_signup, add_lksignup, add_manytasksignup
-from start import add_start
+from manytask import get_cpp_deadlines
+from lk import get_lk_deadlines, get_lk_lessons
+from routes import add_routes
 import sqlite3
 
 # Configure logging
@@ -28,13 +27,6 @@ if __name__ == '__main__':
 
     bot = Bot(token=args.token)
     dp = Dispatcher(bot)
-    
-    add_start(dp, bot)
-    add_signup(dp, bot, conn)
-    add_lksignup(dp, bot, conn)
-    add_manytasksignup(dp, bot, conn)
-    add_manytask(dp, bot, conn)
-    add_lklessions(dp, bot, conn)
-    add_lkdeadline(dp, bot, conn)
+    add_routes(dp, bot, conn)
 
     executor.start_polling(dp, skip_updates=True)

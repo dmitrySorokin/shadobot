@@ -5,8 +5,6 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from aiogram import Bot, Dispatcher, executor, types
-
 
 
 def get_credentials(conn, user_id):
@@ -53,19 +51,9 @@ def get_session(login, password):
     return s
 
 
-def add_lkdeadline(dp, bot, conn):
-    @dp.message_handler(commands=['lk'])
-    async def handle(message: types.Message):
-        try:
-            login, password = get_credentials(conn, message.from_user.id)
-        except TypeError:
-            await bot.send_message(message.from_user.id, f'/signlk для получения информации')
-            return
-
-        try:
-            session = get_session(login, password)
-        except:
-            await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signlk')
+async def get_lk_deadlines(conn, user_id):
+        login, password = get_credentials(conn, user_id)
+        session = get_session(login, password)
 
         soup = BeautifulSoup(session.get('https://lk.yandexdataschool.ru/learning/assignments/').text, 'html.parser')
         for task in soup.find_all('tr'):
@@ -100,24 +88,13 @@ def add_lkdeadline(dp, bot, conn):
                     minute=int(deadline[3][3:5])
                 )
             
-            print(dt, datetime.now(), dt > datetime.now(), dt < datetime.now())
             if dt > datetime.now():
-                await bot.send_message(message.from_user.id, f'dl: {dt}, tn: {task_name}, c: {course}')
+                yield {'deadline': dt, 'task': task_name, 'course': course}
 
 
-def add_lklessions(dp, bot, conn):
-    @dp.message_handler(commands=['lessons'])
-    async def handle(message: types.Message):
-        try:
-            login, password = get_credentials(conn, message.from_user.id)
-        except TypeError:
-            await bot.send_message(message.from_user.id, f'/signlk для получения информации')
-            return
-
-        try:
-            session = get_session(login, password)
-        except:
-            await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signlk')
+async def get_lk_lessons(conn, user_id):
+        login, password = get_credentials(conn, user_id)
+        session = get_session(login, password)
 
         soup = BeautifulSoup(session.get('https://lk.yandexdataschool.ru/learning/courses/').text, 'html.parser')
         for task in soup.find_all('tr'):
@@ -142,7 +119,4 @@ def add_lklessions(dp, bot, conn):
                 )
 
                 if dt > datetime.now():
-                    await bot.send_message(message.from_user.id, f'date: {dt}, lesson {preproc(lesson_name)}')
-
-
-        
+                    yield {'deadline': dt, 'task': 'lesson', 'course': {preproc(lesson_name)}}

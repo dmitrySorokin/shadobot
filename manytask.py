@@ -10,7 +10,8 @@ def get_credentials(conn, user_id):
     return login, password
 
 
-async def get_deadlines(login, password):
+async def get_cpp_deadlines(conn, user_id):
+    login, password = get_credentials(conn, user_id)
     s = requests.Session()
 
     res = s.get('https://gitlab.manytask.org/users/sign_in')
@@ -46,20 +47,4 @@ async def get_deadlines(login, password):
         )
 
         for task in group.find_all('div', class_='task unsolved'):
-            yield task.find('div', class_='name').text, dt
-
-
-def add_manytask(dp, bot, conn):
-    @dp.message_handler(commands=['cpp'])
-    async def handle(message: types.Message):
-        try:
-            login, password = get_credentials(conn, message.from_user.id)
-        except TypeError:
-            await bot.send_message(message.from_user.id, f'/signcpp для получения информации')
-            return
-
-        try:
-            async for task, deadline in get_deadlines(login, password):
-                await bot.send_message(message.from_user.id, f'задача "{task}" до {deadline}')
-        except requests.exceptions:
-            await bot.send_message(message.from_user.id, f'Пароль не верный. Обновите пароль /signcpp')
+            yield {'deadline': dt, 'task': task.find('div', class_='name').text, 'course': 'cpp'}

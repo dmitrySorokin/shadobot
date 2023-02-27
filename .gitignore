@@ -2,4 +2,5 @@ __pycache__
 token
 users.db
 geckodriver.log
+run.sh
 
