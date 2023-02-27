@@ -8,11 +8,19 @@ from schedule import start_notifying
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+CONFIG = {
+    'db_name': 'users.db',
+    'from_hour': 14,
+    'to_hour': 21,
+    'deadline_notify_days': 3,
+    'lesson_notify_min': 15
+}
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('token')
     args = parser.parse_args()
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(CONFIG['db_name'])
     cursor = conn.cursor()
     cursor.execute(
         'CREATE TABLE IF NOT EXISTS users (\
@@ -28,6 +36,6 @@ if __name__ == '__main__':
     dp = Dispatcher(bot)
     add_routes(dp, bot, conn)
 
-    start_notifying(bot)
+    start_notifying(bot, **CONFIG)
 
     executor.start_polling(dp, skip_updates=True)
